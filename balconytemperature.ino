@@ -3,13 +3,13 @@
 #include <DHT.h>
 #include <DHT_U.h>
 
-#include <DS3231.h>
 #include <Wire.h>
+#include <TimeLib.h>
+#include <DS1307RTC.h>
 #include <SPI.h>
 #include <SD.h>
 #define DHTPIN 2     // Digital pin connected to the DHT sensor 
 
-DS3231 clock1;
 File myFile;
 
 
@@ -39,7 +39,6 @@ void setup() {
   Serial.print("Initializing SD card...");
   if (!SD.begin(10)) {
     Serial.println("initialization failed!");
-    dht.begin();
 
     while (1);
   }
@@ -51,38 +50,52 @@ void writeError() {
 }
 
 void writeData(float temperature, float humidity) {
-  myFile = SD.open("balcony.csv", FILE_WRITE);
-  Serial.print(temperature);
-  Serial.println(humidity);
-  myFile.print("20");
-  myFile.print(clock1.getYear(), DEC);
-  myFile.print("-");
-  myFile.print(clock1.getMonth(century), DEC);
-  myFile.print("-");
-  myFile.print(clock1.getDate(), DEC);
-  myFile.print(" ");
-  int hours = clock1.getHour(h12Flag, pmFlag);
-  int minutes = clock1.getMinute();
-  int seconds = clock1.getSecond();
-  if (hours < 10) {
-    myFile.print("0");
+  tmElements_t tm;
+  if (RTC.read(tm)) {
+
+    myFile = SD.open("balcony.csv", FILE_WRITE);
+    Serial.print(temperature);
+    Serial.println(humidity);
+    myFile.print("20");
+    int year = tmYearToCalendar(tm.Year);
+    myFile.print(year, DEC);
+    myFile.print("-");
+    Serial.print(year);
+    int month = tm.Month;
+    if (month < 10) {
+      myFile.print("0");
+    }
+    myFile.print(month, DEC);
+    myFile.print("-");
+    int day = tm.Day;
+    if (day < 10) {
+      myFile.print("0");
+    }
+    myFile.print(day, DEC);
+    myFile.print(" ");
+    int hours = tm.Hour;
+    int minutes = tm.Minute;
+    int seconds = tm.Second;
+    if (hours < 10) {
+      myFile.print("0");
+    }
+    myFile.print(hours, DEC); //24-hr
+    myFile.print(":");
+    if (minutes < 10) {
+      myFile.print("0");
+    }
+    myFile.print(minutes, DEC);
+    myFile.print(":");
+    if (seconds < 10) {
+      myFile.print("0");
+    }
+    myFile.print(seconds, DEC);
+    myFile.print(",");
+    myFile.print(temperature);
+    myFile.print(",");
+    myFile.println(humidity);
+    myFile.close();
   }
-  myFile.print(clock1.getHour(h12Flag, pmFlag), DEC); //24-hr
-  myFile.print(":");
-  if (minutes < 10) {
-    myFile.print("0");
-  }
-  myFile.print(clock1.getMinute(), DEC);
-  myFile.print(":");
-  if (seconds < 10) {
-    myFile.print("0");
-  }
-  myFile.print(clock1.getSecond(), DEC);
-  myFile.print(",");
-  myFile.print(temperature);
-  myFile.print(",");
-  myFile.println(humidity);
-  myFile.close();
 
   Serial.println("done");
 
