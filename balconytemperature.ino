@@ -25,17 +25,17 @@ DHT_Unified dht(DHTPIN, DHTTYPE);
 void setup() {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
-   Wire.begin();
+  Wire.begin();
 
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
-    dht.begin();
+  dht.begin();
 
-    sensor_t sensor;
+  sensor_t sensor;
   dht.temperature().getSensor(&sensor);
-    dht.humidity().getSensor(&sensor);
- 
+  dht.humidity().getSensor(&sensor);
+
   Serial.print("Initializing SD card...");
   if (!SD.begin(10)) {
     Serial.println("initialization failed!");
@@ -43,7 +43,7 @@ void setup() {
 
     while (1);
   }
-  
+
 }
 
 void writeError() {
@@ -51,30 +51,41 @@ void writeError() {
 }
 
 void writeData(float temperature, float humidity) {
-  myFile = SD.open("balcony.csv", 0X04);
-      Serial.print(temperature);
-    Serial.println(humidity);
-      myFile.print("20");
-      myFile.print(clock1.getYear(), DEC);
-      myFile.print("-");
-      myFile.print(clock1.getMonth(century), DEC);
-      myFile.print("-");
-      myFile.print(clock1.getDate(), DEC);
-      myFile.print(" ");
-      myFile.print(clock1.getHour(h12Flag, pmFlag), DEC); //24-hr
-      myFile.print(":");
-      myFile.print(clock1.getMinute(), DEC);
-      myFile.print(":");
-      myFile.print(clock1.getSecond(), DEC);
-      myFile.print(",");
-      myFile.print(temperature);
-      myFile.print(",");
-      myFile.println(humidity);
-      myFile.close();
-      Serial.println(clock1.getYear(), DEC);
+  myFile = SD.open("balcony.csv", FILE_WRITE);
+  Serial.print(temperature);
+  Serial.println(humidity);
+  myFile.print("20");
+  myFile.print(clock1.getYear(), DEC);
+  myFile.print("-");
+  myFile.print(clock1.getMonth(century), DEC);
+  myFile.print("-");
+  myFile.print(clock1.getDate(), DEC);
+  myFile.print(" ");
+  int hours = clock1.getHour(h12Flag, pmFlag);
+  int minutes = clock1.getMinute();
+  int seconds = clock1.getSecond();
+  if (hours < 10) {
+    myFile.print("0");
+  }
+  myFile.print(clock1.getHour(h12Flag, pmFlag), DEC); //24-hr
+  myFile.print(":");
+  if (minutes < 10) {
+    myFile.print("0");
+  }
+  myFile.print(clock1.getMinute(), DEC);
+  myFile.print(":");
+  if (seconds < 10) {
+    myFile.print("0");
+  }
+  myFile.print(clock1.getSecond(), DEC);
+  myFile.print(",");
+  myFile.print(temperature);
+  myFile.print(",");
+  myFile.println(humidity);
+  myFile.close();
 
-      Serial.println("done");
-      
+  Serial.println("done");
+
 
 
 }
@@ -83,16 +94,16 @@ void writeData(float temperature, float humidity) {
 
 void loop() {
   sensors_event_t event;
-  
+
   dht.temperature().getEvent(&event);
   float temperature = event.temperature;
 
-                dht.humidity().getEvent(&event);
+  dht.humidity().getEvent(&event);
   float humidity = event.relative_humidity;
 
   if (isnan(temperature) || isnan(humidity)) {
     //writeError(temperature, humidity)
-    Serial.println("Error brainwave overflow");
+    Serial.println("Error brainwave overload");
 
   }
   else {
@@ -101,7 +112,7 @@ void loop() {
 
   }
 
-        delay(1800000L);
+  delay(1800000L);
 
 
 
