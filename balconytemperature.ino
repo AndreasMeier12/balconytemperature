@@ -56,7 +56,6 @@ void writeData(float temperature, float humidity) {
     myFile = SD.open("balcony.csv", FILE_WRITE);
     Serial.print(temperature);
     Serial.println(humidity);
-    myFile.print("20");
     int year = tmYearToCalendar(tm.Year);
     myFile.print(year, DEC);
     myFile.print("-");
