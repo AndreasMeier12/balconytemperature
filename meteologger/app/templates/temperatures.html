@@ -1,0 +1,31 @@
+{% extends "bootstrap/base.html" %}
+
+{% block content %}
+    <h1>Temperatures</h1>
+    <div class="container">
+        <image src="data:image/png;base64,{{ img }}"/>
+        <table class="table table-dark" id="listtable">
+            <thead id="listhead">
+            <tr>
+                <th class="tg-0pky">time</th>
+                <th class="tg-0pky">temperature</th>
+            </tr>
+            </thead>
+            <tbody id="listbody">
+            {% for temperature_value in temperature_values %}
+                <tr>
+                    <td>
+                        {{ temperature_value.timestamp }}
+                    </td>
+                    <td>{{ temperature_value.value }}</td>
+
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+        </table>
+
+    </div>
+{% endblock %}
