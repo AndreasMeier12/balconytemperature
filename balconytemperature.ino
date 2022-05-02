@@ -31,6 +31,7 @@ void setup() {
     ; // wait for serial port to connect. Needed for native USB port only
   }
   dht.begin();
+  pinMode(LED_BUILTIN, OUTPUT);
 
   sensor_t sensor;
   dht.temperature().getSensor(&sensor);
@@ -51,9 +52,15 @@ void writeError() {
 
 void writeData(float temperature, float humidity) {
   tmElements_t tm;
+  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+
   if (RTC.read(tm)) {
 
     myFile = SD.open("balcony.csv", FILE_WRITE);
+    if(!myFile){
+     digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+    }
+
     Serial.print(temperature);
     Serial.println(humidity);
     int year = tmYearToCalendar(tm.Year);
@@ -94,6 +101,8 @@ void writeData(float temperature, float humidity) {
     myFile.print(",");
     myFile.println(humidity);
     myFile.close();
+  } else {
+      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
   }
 
   Serial.println("done");
