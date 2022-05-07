@@ -50,6 +50,25 @@ void writeError() {
 
 }
 
+void printOut(){
+  myFile = SD.open("balcony.csv");
+  if (myFile) {
+    Serial.println("--------");
+    // read from the file until there's nothing else in it:
+    while (myFile.available()) {
+      Serial.write(myFile.read());
+    }
+        Serial.println("--------");
+
+    // close the file:
+    myFile.close();
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening test.txt");
+  }
+
+}
+
 void writeData(float temperature, float humidity) {
   tmElements_t tm;
   digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
@@ -60,9 +79,6 @@ void writeData(float temperature, float humidity) {
     if(!myFile){
      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
     }
-
-    Serial.print(temperature);
-    Serial.println(humidity);
     int year = tmYearToCalendar(tm.Year);
     myFile.print(year, DEC);
     myFile.print("-");
@@ -105,8 +121,6 @@ void writeData(float temperature, float humidity) {
       digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
   }
 
-  Serial.println("done");
-
 
 
 }
@@ -129,9 +143,8 @@ void loop() {
   }
   else {
     writeData(temperature, humidity);
-
-
   }
+  printOut();
 
   delay(1800000L);
 
